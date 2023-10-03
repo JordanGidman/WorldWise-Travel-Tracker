@@ -10,19 +10,22 @@ import {
 } from "react-leaflet";
 import { useEffect, useState } from "react";
 import { useCities } from "../contexts/CitiesContext";
+import { useGeolocation } from "../hooks/useGeolocation";
+import Button from "../components/Button";
+import { useUrlPosition } from "../hooks/useUrlPosition";
 
 function Map() {
   //a hook we get from react router that allows us to navigate to a specific place without a link such as the below
 
   const { cities } = useCities();
   const [mapPosition, setMapPosition] = useState([40, 0]);
+  const {
+    isLoading: isLoadingPos,
+    position: geoPosition,
+    getPosition,
+  } = useGeolocation();
 
-  console.log(useSearchParams);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const mapLat = searchParams.get("lat");
-  const mapLng = searchParams.get("lng");
-
-  console.log(setSearchParams);
+  const [mapLat, mapLng] = useUrlPosition();
 
   //This effect will sync the map postion with the currently selected city so that the map will update accordingly
   useEffect(
@@ -33,8 +36,15 @@ function Map() {
     [mapLat, mapLng]
   );
 
+  useEffect(() => {
+    if (geoPosition) setMapPosition([geoPosition.lat, geoPosition.lng]);
+  }, [geoPosition]);
+
   return (
     <div className={styles.mapContainer}>
+      <Button type="position" onClick={getPosition}>
+        {isLoadingPos ? "Loading..." : "Use your position"}
+      </Button>
       <MapContainer
         center={mapPosition}
         zoom={6}
