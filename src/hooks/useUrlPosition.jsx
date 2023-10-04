@@ -5,7 +5,5 @@ export function useUrlPosition() {
   const mapLat = searchParams.get("lat");
   const mapLng = searchParams.get("lng");
 
-  console.log(setSearchParams);
-
   return [mapLat, mapLng];
 }

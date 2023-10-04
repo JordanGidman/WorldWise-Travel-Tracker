@@ -30,7 +30,6 @@ function Map() {
   //This effect will sync the map postion with the currently selected city so that the map will update accordingly
   useEffect(
     function () {
-      console.log(mapLat, mapLng);
       if (mapLat && mapLng) setMapPosition([mapLat, mapLng]);
     },
     [mapLat, mapLng]
