@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import {
   createContext,
   useState,
@@ -95,22 +96,27 @@ function CitiesProvider({ children }) {
     fetchCities();
   }, []);
 
-  async function getCity(id) {
-    //Must be converted to a number as any data taken from the url is a string
-    if (Number(id) === currentCity.id) return;
+  //We put this inside use callback due to its use in the City.jsx file as it is used inside a useEffect which caused an infinite loop. It is fixed by memoizing the value
+  const getCity = useCallback(
+    async function getCity(id) {
+      //Must be converted to a number as any data taken from the url is a string
+      if (Number(id) === currentCity.id) return;
 
-    dispatch({ type: "loading" });
-    try {
-      const res = await fetch(`${BASE_URL}/cities/${id}`);
-      const data = await res.json();
-      dispatch({ type: "city/loaded", payload: data });
-    } catch (err) {
-      dispatch({
-        type: "rejected",
-        payload: `there was an error loading city...`,
-      });
-    }
-  }
+      dispatch({ type: "loading" });
+      try {
+        const res = await fetch(`${BASE_URL}/cities/${id}`);
+        const data = await res.json();
+        dispatch({ type: "city/loaded", payload: data });
+      } catch (err) {
+        dispatch({
+          type: "rejected",
+          payload: `there was an error loading city...`,
+        });
+      }
+    },
+    [currentCity.id]
+  );
+
   async function createCity(newCity) {
     try {
       dispatch({ type: "loading" });
@@ -130,6 +136,7 @@ function CitiesProvider({ children }) {
       });
     }
   }
+
   async function deleteCity(id) {
     try {
       dispatch({ type: "loading" });
